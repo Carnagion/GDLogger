@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace Godot
 {
+    /// <summary>
+    /// Handles the logging of messages and <see cref="Exception"/>s to a log file.
+    /// </summary>
     public static class Log
     {
         static Log()
@@ -27,6 +30,9 @@ namespace Godot
         
         private static DateTime lastSynced;
 
+        /// <summary>
+        /// Gets or sets the file path to which log entries are written.
+        /// </summary>
         public static string FilePath
         {
             get
@@ -45,6 +51,10 @@ namespace Godot
             }
         }
         
+        /// <summary>
+        /// Writes the text representation of <paramref name="entry"/> to the log file. Also writes to the console in debug mode.
+        /// </summary>
+        /// <param name="entry">The <see cref="Entry"/> to write.</param>
         public static void Write(Entry entry)
         {
 #if DEBUG
@@ -59,26 +69,46 @@ namespace Godot
             Log.Flush();
         }
 
+        /// <summary>
+        /// Writes <paramref name="message"/> to the log file, encoding it as a notification.
+        /// </summary>
+        /// <param name="message">The message to write.</param>
         public static void Notification(string message)
         {
             Log.Write(new(message, Entry.MessageSeverity.Notification));
         }
 
+        /// <summary>
+        /// Writes <paramref name="message"/> to the log file, encoding it as a warning.
+        /// </summary>
+        /// <param name="message">The message to write.</param>
         public static void Warning(string message)
         {
             Log.Write(new(message, Entry.MessageSeverity.Warning));
         }
 
+        /// <summary>
+        /// Writes the text representation of <paramref name="exception"/> to the log file, encoding it as a warning.
+        /// </summary>
+        /// <param name="exception">The <see cref="Exception"/> to write.</param>
         public static void Warning(Exception exception)
         {
             Log.Write(new(exception.ToString(), Entry.MessageSeverity.Warning));
         }
 
+        /// <summary>
+        /// Writes <paramref name="message"/> to the log file, encoding it as an error.
+        /// </summary>
+        /// <param name="message">The message to write.</param>
         public static void Error(string message)
         {
             Log.Write(new(message, Entry.MessageSeverity.Error));
         }
 
+        /// <summary>
+        /// Writes the text representation of <paramref name="exception"/> to the log file, encoding it as an error.
+        /// </summary>
+        /// <param name="exception">The <see cref="Exception"/> to write.</param>
         public static void Error(Exception exception)
         {
             Log.Write(new(exception.ToString(), Entry.MessageSeverity.Error));
@@ -120,8 +150,16 @@ namespace Godot
             Log.file.Dispose();
         }
 
+        /// <summary>
+        /// Represents a log entry.
+        /// </summary>
         public sealed record Entry
         {
+            /// <summary>
+            /// Initialises a new <see cref="Entry"/> with the specified parameters.
+            /// </summary>
+            /// <param name="message">The message to include in the <see cref="Entry"/>.</param>
+            /// <param name="severity">The <see cref="Entry"/>'s severity level.</param>
             public Entry(string message, MessageSeverity severity)
             {
                 this.Message = message.Trim();
@@ -129,30 +167,55 @@ namespace Godot
                 this.Timestamp = DateTime.Now;
             }
             
+            /// <summary>
+            /// The message of the <see cref="Entry"/>.
+            /// </summary>
             public string Message
             {
                 get;
             }
 
+            /// <summary>
+            /// The time when the <see cref="Entry"/> was created.
+            /// </summary>
             public DateTime Timestamp
             {
                 get;
             }
 
+            /// <summary>
+            /// The severity level of the <see cref="Entry"/>.
+            /// </summary>
             public MessageSeverity Severity
             {
                 get;
             }
 
+            /// <summary>
+            /// Returns a <see cref="String"/> that represents the <see cref="Entry"/>.
+            /// </summary>
+            /// <returns>A <see cref="String"/> in the format "[Severity] at [Timestamp] - [Message]".</returns>
             public override string ToString()
             {
                 return $"[{this.Severity}] at {this.Timestamp.Hour}:{this.Timestamp.Minute}:{this.Timestamp.Second}:{this.Timestamp.Millisecond} - {this.Message}";
             }
 
+            /// <summary>
+            /// Represents a log entry severity.
+            /// </summary>
             public enum MessageSeverity
             {
+                /// <summary>
+                /// Miscellaneous information.
+                /// </summary>
                 Notification,
+                /// <summary>
+                /// Minor errors that can usually be recovered from.
+                /// </summary>
                 Warning,
+                /// <summary>
+                /// Major errors that usually stop the program.
+                /// </summary>
                 Error,
             }
         }
