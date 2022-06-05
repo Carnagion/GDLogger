@@ -1,0 +1,20 @@
+<Project Sdk="Godot.NET.Sdk/3.3.0">
+  <PropertyGroup>
+    <TargetFrameworks>net472;netstandard2.1</TargetFrameworks>
+    <LangVersion>default</LangVersion>
+    <Nullable>enable</Nullable>
+    <RootNamespace>Godot</RootNamespace>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <DocumentationFile>C:\Users\Indraneel\Projects\GDLogger\.mono\temp\bin\Debug\GDLogger.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'ExportDebug' ">
+    <DocumentationFile>C:\Users\Indraneel\Projects\GDLogger\.mono\temp\bin\ExportDebug\GDLogger.xml</DocumentationFile>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'ExportRelease' ">
+    <DocumentationFile>C:\Users\Indraneel\Projects\GDLogger\.mono\temp\bin\ExportRelease\GDLogger.xml</DocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include=".gitignore" />
+  </ItemGroup>
+</Project>
