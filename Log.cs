@@ -31,7 +31,7 @@ namespace Godot
         private static DateTime lastSynced;
 
         /// <summary>
-        /// Gets or sets the file path to which log entries are written.
+        /// The file path to which log entries are written.
         /// </summary>
         public static string FilePath
         {
@@ -194,7 +194,7 @@ namespace Godot
             /// <summary>
             /// Returns a <see cref="String"/> that represents the <see cref="Entry"/>.
             /// </summary>
-            /// <returns>A <see cref="String"/> in the format "[Severity] at [Timestamp] - [Message]".</returns>
+            /// <returns>A <see cref="String"/> in the format "[Severity] at Timestamp - Message".</returns>
             public override string ToString()
             {
                 return $"[{this.Severity}] at {this.Timestamp.Hour}:{this.Timestamp.Minute}:{this.Timestamp.Second}:{this.Timestamp.Millisecond} - {this.Message}";
