@@ -1,7 +1,7 @@
 extends Node
 
 func _init() -> void:
-	self.set_file_path(DEFAULT_FILE_PATH)
+	self.set_file_path(self.DEFAULT_FILE_PATH)
 
 const DEFAULT_FILE_PATH: String = "user://Log.txt"
 
@@ -36,7 +36,7 @@ func get_file_path() -> String:
 func write(entry: Entry) -> void:
 	print_debug(entry)
 	self._file.store_line(entry.to_string())
-	if self._entries.size() == Log.MAX_ENTRY_COUNT:
+	if self._entries.size() == self.MAX_ENTRY_COUNT:
 		self._entries.pop_front().free()
 	self._entries.push_back(entry)
 	self._flush()
@@ -52,7 +52,7 @@ func error(message: String) -> void:
 
 func _flush(force: bool = false) -> void:
 	var now: int = OS.get_ticks_msec() / 1000
-	if (not force) and (now - self._last_synced < Log.MAX_FLUSH_INTERVAL_SECONDS) and (self._entries.size() < Log.MAX_FLUSH_INTERVAL_MESSAGES):
+	if (not force) and (now - self._last_synced < self.MAX_FLUSH_INTERVAL_SECONDS) and (self._entries.size() < self.MAX_FLUSH_INTERVAL_MESSAGES):
 		return
 	# If it has been 60 seconds since the last flush, or if there are 10 or more entries in the queue, flush immediately
 	self._entries.clear()
