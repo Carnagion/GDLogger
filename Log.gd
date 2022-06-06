@@ -1,5 +1,7 @@
+## Handles the logging of messages to a log file.
 extends Node
 
+## Initialises a new [Log].
 func _init() -> void:
 	self.set_file_path(self.DEFAULT_FILE_PATH)
 
@@ -17,12 +19,15 @@ var _file: File = File.new()
 
 var _last_synced: int = 0
 
+## The file path to which log entries are written.
 var file_path: String setget set_file_path, get_file_path
 
+## Closes the log file if the quit request notification is received.
 func _notification(notif: int) -> void:
 	if notif == MainLoop.NOTIFICATION_WM_QUIT_REQUEST and self._file.is_open():
 		self._file.close()
 
+## Sets the file path to which log entries are written, automatically closing the previous log file (if any).
 func set_file_path(path: String) -> void:
 	# If a previous log file already exists, save its contents and close it
 	if self._file.is_open():
@@ -30,9 +35,11 @@ func set_file_path(path: String) -> void:
 		self._file.close()
 	self._file.open(path, File.WRITE)
 
+## Gets the file path to which log entries are written.
 func get_file_path() -> String:
 	return self._file.get_path_absolute()
 
+## Writes the text representation of the entry to the log file. Also writes to the console in debug mode.
 func write(entry: Entry) -> void:
 	print_debug(entry)
 	self._file.store_line(entry.to_string())
@@ -41,12 +48,15 @@ func write(entry: Entry) -> void:
 	self._entries.push_back(entry)
 	self._flush()
 
+## Writes the message to the log file, encoding it as a notification.
 func notify(message: String) -> void:
 	self.write(Entry.new(message, Entry.MessageSeverity.NOTIFICATION))
 
+## Writes the message to the log file, encoding it as a warning.
 func warning(message: String) -> void:
 	self.write(Entry.new(message, Entry.MessageSeverity.WARNING))
 
+## Writes the message to the log file, encoding it as an error.
 func error(message: String) -> void:
 	self.write(Entry.new(message, Entry.MessageSeverity.ERROR))
 
@@ -59,28 +69,37 @@ func _flush(force: bool = false) -> void:
 	self._file.flush()
 	self._last_synced = now
 
+## Represents a log entry.
 class Entry extends Object:
 
+	## Initialises a new [Entry] with the specified parameters.
 	func _init(message: String, severity: int) -> void:
-		self._message = message
-		self._severity = severity
-		self._timestamp = OS.get_datetime()
+		self.message = message
+		self.severity = severity
+		self.timestamp = OS.get_datetime()
 
-	var _message: String setget , get_message
+	## The message of the [Entry].
+	var message: String setget , get_message
 
-	var _timestamp: Dictionary setget , get_timestamp
+	## The time when the [Entry] was created, returned as a [Dictionary] of keys (see [method OS.get_datetime]).
+	var timestamp: Dictionary setget , get_timestamp
 
-	var _severity: int setget , get_severity
+	## The severity level of the [Entry].
+	var severity: int setget , get_severity
 
+	## Gets the message of the [Entry].
 	func get_message() -> String:
-		return _message # Using self here will trigger the getter and recursively run the function. Dumb design decision, Godot devs
+		return message # Using self here will trigger the getter and recursively run the function. Dumb design decision, Godot devs
 
+	## Gets the timestamp of the [Entry].
 	func get_timestamp() -> Dictionary:
-		return _timestamp.duplicate() # Using self here will trigger the getter and recursively run the function
+		return timestamp.duplicate() # Using self here will trigger the getter and recursively run the function
 
+	## Gets the severity level of the [Entry].
 	func get_severity() -> int:
-		return _severity # Using self here will trigger the getter and recursively run the function
+		return severity # Using self here will trigger the getter and recursively run the function
 
+	## Returns a [String] that represents the [Entry].
 	func _to_string() -> String:
 		return "[%s] at %d:%d:%d - %s" % [Entry._severity_to_string(self._severity), self._timestamp["hour"], self._timestamp["minute"], self._timestamp["second"], self._message]
 
@@ -95,8 +114,9 @@ class Entry extends Object:
 			_: # Technically, this case will never be reached, but it needs to be there since all paths must return a value
 				return ""
 
+	## Represents a log entry severity.
 	enum MessageSeverity {
-		NOTIFICATION,
-		WARNING,
-		ERROR,
+		NOTIFICATION, ## Miscellaneous information.
+		WARNING, ## Minor errors that can usually be recovered from.
+		ERROR, ## Major errors that usually stop the program.
 	}
