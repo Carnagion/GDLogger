@@ -16,5 +16,6 @@
     </PropertyGroup>
     <ItemGroup>
         <Content Include=".gitignore" />
+        <Content Include="Log.gd" />
     </ItemGroup>
 </Project>
