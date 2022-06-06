@@ -73,9 +73,9 @@ namespace Godot
         /// Writes <paramref name="message"/> to the log file, encoding it as a notification.
         /// </summary>
         /// <param name="message">The message to write.</param>
-        public static void Notification(string message)
+        public static void Write(string message)
         {
-            Log.Write(new(message, Entry.MessageSeverity.Notification));
+            Log.Write(new Entry(message, Entry.MessageSeverity.Notification));
         }
 
         /// <summary>
@@ -84,7 +84,7 @@ namespace Godot
         /// <param name="message">The message to write.</param>
         public static void Warning(string message)
         {
-            Log.Write(new(message, Entry.MessageSeverity.Warning));
+            Log.Write(new Entry(message, Entry.MessageSeverity.Warning));
         }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace Godot
         /// <param name="exception">The <see cref="Exception"/> to write.</param>
         public static void Warning(Exception exception)
         {
-            Log.Write(new(exception.ToString(), Entry.MessageSeverity.Warning));
+            Log.Write(new Entry(exception.ToString(), Entry.MessageSeverity.Warning));
         }
 
         /// <summary>
@@ -102,7 +102,7 @@ namespace Godot
         /// <param name="message">The message to write.</param>
         public static void Error(string message)
         {
-            Log.Write(new(message, Entry.MessageSeverity.Error));
+            Log.Write(new Entry(message, Entry.MessageSeverity.Error));
         }
 
         /// <summary>
@@ -111,7 +111,7 @@ namespace Godot
         /// <param name="exception">The <see cref="Exception"/> to write.</param>
         public static void Error(Exception exception)
         {
-            Log.Write(new(exception.ToString(), Entry.MessageSeverity.Error));
+            Log.Write(new Entry(exception.ToString(), Entry.MessageSeverity.Error));
         }
 
         private static void Flush(bool force = false)
@@ -130,13 +130,16 @@ namespace Godot
 
         private static void OnUnhandledException(object source, UnhandledExceptionEventArgs arguments)
         {
-            Log.Write(new(arguments.ExceptionObject.ToString(), Entry.MessageSeverity.Error));
+            Log.Write(new Entry(arguments.ExceptionObject.ToString(), Entry.MessageSeverity.Error));
             if (!arguments.IsTerminating)
             {
                 return;
             }
-            
-            Log.file.Close();
+
+            if (Log.file.IsOpen())
+            {
+                Log.file.Close();
+            }
             Log.file.Dispose();
             AppDomain.CurrentDomain.ProcessExit -= Log.OnProcessExit;
         }

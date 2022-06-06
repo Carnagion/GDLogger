@@ -39,8 +39,8 @@ func set_file_path(path: String) -> void:
 func get_file_path() -> String:
 	return self._file.get_path_absolute()
 
-## Writes the text representation of the entry to the log file. Also writes to the console in debug mode.
-func write(entry: Entry) -> void:
+## Writes the text representation of the [Entry] to the log file. Also writes to the console in debug mode.
+func write_entry(entry: Entry) -> void:
 	print_debug(entry)
 	self._file.store_line(entry.to_string())
 	if self._entries.size() == self.MAX_ENTRY_COUNT:
@@ -49,16 +49,16 @@ func write(entry: Entry) -> void:
 	self._flush()
 
 ## Writes the message to the log file, encoding it as a notification.
-func notify(message: String) -> void:
-	self.write(Entry.new(message, Entry.MessageSeverity.NOTIFICATION))
+func write(message: String) -> void:
+	self.write_entry(Entry.new(message, Entry.MessageSeverity.NOTIFICATION))
 
 ## Writes the message to the log file, encoding it as a warning.
 func warning(message: String) -> void:
-	self.write(Entry.new(message, Entry.MessageSeverity.WARNING))
+	self.write_entry(Entry.new(message, Entry.MessageSeverity.WARNING))
 
 ## Writes the message to the log file, encoding it as an error.
 func error(message: String) -> void:
-	self.write(Entry.new(message, Entry.MessageSeverity.ERROR))
+	self.write_entry(Entry.new(message, Entry.MessageSeverity.ERROR))
 
 func _flush(force: bool = false) -> void:
 	var now: int = OS.get_ticks_msec() / 1000
