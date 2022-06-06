@@ -4,6 +4,12 @@
         <LangVersion>default</LangVersion>
         <Nullable>enable</Nullable>
         <RootNamespace>Godot</RootNamespace>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <Title>GDLogger</Title>
+        <Authors>Carnagion</Authors>
+        <Description>A simple logger for Godot projects.</Description>
+        <RepositoryUrl>https://github.com/Carnagion/GDSerializer</RepositoryUrl>
+        <PackageLicenseFile>LICENSE</PackageLicenseFile>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
         <DocumentationFile>.\.mono\temp\bin\Debug\GDLogger.xml</DocumentationFile>
@@ -16,6 +22,9 @@
     </PropertyGroup>
     <ItemGroup>
         <Content Include=".gitignore" />
+        <Content Include="LICENSE" />
+        <Content Include="README.md" />
         <Content Include="Log.gd" />
+        <None Include="LICENSE" Pack="true" PackagePath=""/>
     </ItemGroup>
 </Project>
