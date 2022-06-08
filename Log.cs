@@ -15,21 +15,21 @@ namespace Godot
             AppDomain.CurrentDomain.UnhandledException += Log.OnUnhandledException;
             AppDomain.CurrentDomain.ProcessExit += Log.OnProcessExit;
         }
-
+        
         private const string defaultFilePath = "user://Log.txt";
         
         private const int maxEntryCount = 100;
-
+        
         private const int maxFlushIntervalSeconds = 60;
-
+        
         private const int maxFlushIntervalMessages = 10;
         
         private static readonly Queue<Entry> entries = new(Log.maxEntryCount + 1);
-
+        
         private static readonly File file = new();
         
         private static DateTime lastSynced;
-
+        
         /// <summary>
         /// The file path to which log entries are written.
         /// </summary>
@@ -55,7 +55,7 @@ namespace Godot
         /// Emitted when an <see cref="Entry"/> has just been written to the log file.
         /// </summary>
         public static event Action<Entry>? EntryWritten;
-
+        
         /// <summary>
         /// Writes the text representation of <paramref name="entry"/> to the log file. Also writes to the console in debug mode.
         /// </summary>
@@ -74,7 +74,7 @@ namespace Godot
             Log.Flush();
             Log.EntryWritten?.Invoke(entry);
         }
-
+        
         /// <summary>
         /// Writes <paramref name="message"/> to the log file, encoding it as a notification.
         /// </summary>
@@ -83,7 +83,7 @@ namespace Godot
         {
             Log.Write(new Entry(message, Entry.MessageSeverity.Notification));
         }
-
+        
         /// <summary>
         /// Writes <paramref name="message"/> to the log file, encoding it as a warning.
         /// </summary>
@@ -92,7 +92,7 @@ namespace Godot
         {
             Log.Write(new Entry(message, Entry.MessageSeverity.Warning));
         }
-
+        
         /// <summary>
         /// Writes the text representation of <paramref name="exception"/> to the log file, encoding it as a warning.
         /// </summary>
@@ -101,7 +101,7 @@ namespace Godot
         {
             Log.Write(new Entry(exception.ToString(), Entry.MessageSeverity.Warning));
         }
-
+        
         /// <summary>
         /// Writes <paramref name="message"/> to the log file, encoding it as an error.
         /// </summary>
@@ -110,7 +110,7 @@ namespace Godot
         {
             Log.Write(new Entry(message, Entry.MessageSeverity.Error));
         }
-
+        
         /// <summary>
         /// Writes the text representation of <paramref name="exception"/> to the log file, encoding it as an error.
         /// </summary>
@@ -119,7 +119,7 @@ namespace Godot
         {
             Log.Write(new Entry(exception.ToString(), Entry.MessageSeverity.Error));
         }
-
+        
         private static void Flush(bool force = false)
         {
             DateTime now = DateTime.Now;
@@ -133,7 +133,7 @@ namespace Godot
             Log.file.Flush();
             Log.lastSynced = now;
         }
-
+        
         private static void OnUnhandledException(object source, UnhandledExceptionEventArgs arguments)
         {
             Log.Write(new Entry(arguments.ExceptionObject.ToString(), Entry.MessageSeverity.Error));
@@ -141,7 +141,7 @@ namespace Godot
             {
                 return;
             }
-
+            
             if (Log.file.IsOpen())
             {
                 Log.file.Close();
@@ -149,7 +149,7 @@ namespace Godot
             Log.file.Dispose();
             AppDomain.CurrentDomain.ProcessExit -= Log.OnProcessExit;
         }
-
+        
         private static void OnProcessExit(object source, EventArgs arguments)
         {
             if (Log.file.IsOpen())
@@ -158,7 +158,7 @@ namespace Godot
             }
             Log.file.Dispose();
         }
-
+        
         /// <summary>
         /// Represents a log entry.
         /// </summary>
@@ -183,7 +183,7 @@ namespace Godot
             {
                 get;
             }
-
+            
             /// <summary>
             /// The time when the <see cref="Entry"/> was created.
             /// </summary>
@@ -191,7 +191,7 @@ namespace Godot
             {
                 get;
             }
-
+            
             /// <summary>
             /// The severity level of the <see cref="Entry"/>.
             /// </summary>
@@ -199,7 +199,7 @@ namespace Godot
             {
                 get;
             }
-
+            
             /// <summary>
             /// Returns a <see cref="String"/> that represents the <see cref="Entry"/>.
             /// </summary>
@@ -208,7 +208,7 @@ namespace Godot
             {
                 return $"[{this.Severity}] at {this.Timestamp.Hour}:{this.Timestamp.Minute}:{this.Timestamp.Second}:{this.Timestamp.Millisecond} - {this.Message}";
             }
-
+            
             /// <summary>
             /// Represents a log entry severity.
             /// </summary>
