@@ -8,7 +8,7 @@
         <Title>GDLogger</Title>
         <Authors>Carnagion</Authors>
         <Description>A simple logger for Godot projects.</Description>
-        <RepositoryUrl>https://github.com/Carnagion/GDSerializer</RepositoryUrl>
+        <RepositoryUrl>https://github.com/Carnagion/GDLogger</RepositoryUrl>
         <PackageLicenseFile>LICENSE</PackageLicenseFile>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
