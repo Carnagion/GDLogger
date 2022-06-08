@@ -22,6 +22,9 @@ var _last_synced: int = 0
 ## The file path to which log entries are written.
 var file_path: String setget set_file_path, get_file_path
 
+## Emitted when an entry is written to the log file.
+signal entry_written(entry)
+
 ## Closes the log file if the quit request notification is received.
 func _notification(notif: int) -> void:
 	if notif == MainLoop.NOTIFICATION_WM_QUIT_REQUEST and self._file.is_open():
@@ -47,6 +50,7 @@ func write_entry(entry: Entry) -> void:
 		self._entries.pop_front().free()
 	self._entries.push_back(entry)
 	self._flush()
+	self.emit_signal("entry_written", entry)
 
 ## Writes the message to the log file, encoding it as a notification.
 func write(message: String) -> void:
