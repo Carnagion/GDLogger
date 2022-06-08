@@ -52,6 +52,11 @@ namespace Godot
         }
         
         /// <summary>
+        /// Emitted when an <see cref="Entry"/> has just been written to the log file.
+        /// </summary>
+        public static event Action<Entry>? EntryWritten;
+
+        /// <summary>
         /// Writes the text representation of <paramref name="entry"/> to the log file. Also writes to the console in debug mode.
         /// </summary>
         /// <param name="entry">The <see cref="Entry"/> to write.</param>
@@ -67,6 +72,7 @@ namespace Godot
             }
             Log.entries.Enqueue(entry);
             Log.Flush();
+            Log.EntryWritten?.Invoke(entry);
         }
 
         /// <summary>
