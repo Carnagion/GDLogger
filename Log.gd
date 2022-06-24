@@ -114,7 +114,7 @@ class Entry extends Object:
 
 	## Returns a [String] that represents the [Entry].
 	func _to_string() -> String:
-		return "[%s] at %d:%d:%d - %s" % [Entry._severity_to_string(self._severity), self._timestamp["hour"], self._timestamp["minute"], self._timestamp["second"], self._message]
+		return "[%s] at %d:%d:%d - %s" % [Entry._severity_to_string(self.severity), self.timestamp["hour"], self.timestamp["minute"], self.timestamp["second"], self.message]
 
 	static func _severity_to_string(severity: int) -> String:
 		match severity:
