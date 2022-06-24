@@ -62,9 +62,7 @@ namespace Godot
         /// <param name="entry">The <see cref="Entry"/> to write.</param>
         public static void Write(Entry entry)
         {
-#if DEBUG
-            GD.Print(entry);
-#endif
+            Log.GodotPrint(entry);
             Log.file.StoreLine(entry.ToString());
             if (Log.entries.Count is Log.maxEntryCount)
             {
@@ -132,6 +130,22 @@ namespace Godot
             Log.entries.Clear();
             Log.file.Flush();
             Log.lastSynced = now;
+        }
+
+        private static void GodotPrint(Entry entry)
+        {
+            switch (entry.Severity)
+            {
+                case Entry.MessageSeverity.Notification:
+                    GD.Print(entry);
+                    break;
+                case Entry.MessageSeverity.Warning:
+                    GD.PushWarning(entry.ToString());
+                    break;
+                case Entry.MessageSeverity.Error:
+                    GD.PushError(entry.ToString());
+                    break;
+            }
         }
         
         private static void OnUnhandledException(object source, UnhandledExceptionEventArgs arguments)

@@ -44,7 +44,7 @@ func get_file_path() -> String:
 
 ## Writes the text representation of the [Entry] to the log file. Also writes to the console in debug mode.
 func write_entry(entry: Entry) -> void:
-	print_debug(entry)
+	self._godot_print(entry)
 	self._file.store_line(entry.to_string())
 	if self._entries.size() == self.MAX_ENTRY_COUNT:
 		self._entries.pop_front().free()
@@ -72,6 +72,15 @@ func _flush(force: bool = false) -> void:
 	self._entries.clear()
 	self._file.flush()
 	self._last_synced = now
+
+func _godot_print(entry: Entry) -> void:
+	match entry.severity:
+		Entry.MessageSeverity.NOTIFICATION:
+			print(entry)
+		Entry.MessageSeverity.WARNING:
+			push_warning(entry.to_string())
+		Entry.MessageSeverity.ERROR:
+			push_error(entry.to_string())
 
 ## Represents a log entry.
 class Entry extends Object:
