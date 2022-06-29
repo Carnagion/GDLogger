@@ -22,6 +22,9 @@ var _last_synced: int = 0
 ## The file path to which log entries are written.
 var file_path: String setget set_file_path, get_file_path
 
+## Emitted when an entry is written to the log file.
+signal entry_written(entry)
+
 ## Closes the log file if the quit request notification is received.
 func _notification(notif: int) -> void:
 	if notif == MainLoop.NOTIFICATION_WM_QUIT_REQUEST and self._file.is_open():
@@ -41,12 +44,13 @@ func get_file_path() -> String:
 
 ## Writes the text representation of the [Entry] to the log file. Also writes to the console in debug mode.
 func write_entry(entry: Entry) -> void:
-	print_debug(entry)
+	self._godot_print(entry)
 	self._file.store_line(entry.to_string())
 	if self._entries.size() == self.MAX_ENTRY_COUNT:
 		self._entries.pop_front().free()
 	self._entries.push_back(entry)
 	self._flush()
+	self.emit_signal("entry_written", entry)
 
 ## Writes the message to the log file, encoding it as a notification.
 func write(message: String) -> void:
@@ -68,6 +72,15 @@ func _flush(force: bool = false) -> void:
 	self._entries.clear()
 	self._file.flush()
 	self._last_synced = now
+
+func _godot_print(entry: Entry) -> void:
+	match entry.severity:
+		Entry.MessageSeverity.NOTIFICATION:
+			print(entry)
+		Entry.MessageSeverity.WARNING:
+			push_warning(entry.to_string())
+		Entry.MessageSeverity.ERROR:
+			push_error(entry.to_string())
 
 ## Represents a log entry.
 class Entry extends Object:
@@ -101,7 +114,7 @@ class Entry extends Object:
 
 	## Returns a [String] that represents the [Entry].
 	func _to_string() -> String:
-		return "[%s] at %d:%d:%d - %s" % [Entry._severity_to_string(self._severity), self._timestamp["hour"], self._timestamp["minute"], self._timestamp["second"], self._message]
+		return "[%s] at %d:%d:%d - %s" % [Entry._severity_to_string(self.severity), self.timestamp["hour"], self.timestamp["minute"], self.timestamp["second"], self.message]
 
 	static func _severity_to_string(severity: int) -> String:
 		match severity:
