@@ -14,7 +14,7 @@ Additionally, the C# version automatically logs unhandled `Exception`s.
   Simply include the following lines in a Godot project's `.csproj` file (either by editing the file manually or letting an IDE install the package):
   ```xml
   <ItemGroup>
-    <PackageReference Include="GDLogger" Version="1.0.0"/>
+    <PackageReference Include="GDLogger" Version="1.0.1"/>
   </ItemGroup>
   ```
   Due to [a bug](https://github.com/godotengine/godot/issues/42271) in Godot, the following lines will also need to be included in the `.csproj` file to properly compile along with NuGet packages:
