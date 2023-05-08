@@ -14,14 +14,8 @@ Additionally, the C# version automatically logs unhandled `Exception`s.
   Simply include the following lines in a Godot project's `.csproj` file (either by editing the file manually or letting an IDE install the package):
   ```xml
   <ItemGroup>
-    <PackageReference Include="GDLogger" Version="1.0.1"/>
+    <PackageReference Include="GDLogger" Version="2.0.0"/>
   </ItemGroup>
-  ```
-  Due to [a bug](https://github.com/godotengine/godot/issues/42271) in Godot, the following lines will also need to be included in the `.csproj` file to properly compile along with NuGet packages:
-  ```xml
-  <PropertyGroup>
-      <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
-  </PropertyGroup>
   ```
 - ## GDScript
   As there is no dedicated package management system for GDScript, simply download the `Log.gd` file and include it in a Godot project.  
@@ -31,7 +25,14 @@ Additionally, the C# version automatically logs unhandled `Exception`s.
 
 For a GDScript-only project, use the `Log.gd` file.
 
-For a Mono (C#) project, use the `Log` static class.  
+For a .Net (C#) project, use the `Log` static class.  
 Note that this uses custom types that cannot be marshalled by the Godot engine. As such, if the logger's methods need to be called from both GDScript and C#, the GDScript version (`Log.gd`) should be used instead, as it inherits from `Node`.
 
 Do not attempt to use both the C# and the GDScript versions of the logger at the same time, as it will lead to errors if trying to write to the same log file.
+
+# Versioning
+
+**GDLogger** uses [Semantic Versioning](https://semver.org/).
+
+For Godot 3.5 users, the latest version is `1.0.1`.
+For Godot 4.0 users, the latest version is `2.0.0`.

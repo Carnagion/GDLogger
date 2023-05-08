@@ -26,7 +26,7 @@ namespace Godot
         
         private static readonly Queue<Entry> entries = new(Log.maxEntryCount + 1);
         
-        private static readonly File file = new();
+        private static FileAccess file;
         
         private static DateTime lastSynced;
         
@@ -47,7 +47,7 @@ namespace Godot
                     Log.Flush(true);
                     Log.file.Close();
                 }
-                Log.file.Open(value, File.ModeFlags.Write);
+                file = FileAccess.Open(value, FileAccess.ModeFlags.Write);
             }
         }
         
@@ -164,7 +164,7 @@ namespace Godot
             AppDomain.CurrentDomain.ProcessExit -= Log.OnProcessExit;
         }
         
-        private static void OnProcessExit(object source, EventArgs arguments)
+        private static void OnProcessExit(object? source, EventArgs arguments)
         {
             if (Log.file.IsOpen())
             {

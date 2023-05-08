@@ -15,19 +15,19 @@ const MAX_FLUSH_INTERVAL_MESSAGES: int = 10
 
 var _entries: Array = []
 
-var _file: File = File.new()
+var _file: FileAccess
 
 var _last_synced: int = 0
 
 ## The file path to which log entries are written.
-var file_path: String setget set_file_path, get_file_path
+var file_path: String: set = set_file_path, get = get_file_path
 
 ## Emitted when an entry is written to the log file.
 signal entry_written(entry)
 
 ## Closes the log file if the quit request notification is received.
 func _notification(notif: int) -> void:
-	if notif == MainLoop.NOTIFICATION_WM_QUIT_REQUEST and self._file.is_open():
+	if notif == NOTIFICATION_WM_CLOSE_REQUEST and self._file.is_open():
 		self._file.close()
 
 ## Sets the file path to which log entries are written, automatically closing the previous log file (if any).
@@ -36,7 +36,7 @@ func set_file_path(path: String) -> void:
 	if self._file.is_open():
 		self._flush(true)
 		self._file.close()
-	self._file.open(path, File.WRITE)
+	self._file.open(path, FileAccess.WRITE)
 
 ## Gets the file path to which log entries are written.
 func get_file_path() -> String:
@@ -65,7 +65,7 @@ func error(message: String) -> void:
 	self.write_entry(Entry.new(message, Entry.MessageSeverity.ERROR))
 
 func _flush(force: bool = false) -> void:
-	var now: int = OS.get_ticks_msec() / 1000
+	var now: int = Time.get_ticks_msec() / 1000
 	if (not force) and (now - self._last_synced < self.MAX_FLUSH_INTERVAL_SECONDS) and (self._entries.size() < self.MAX_FLUSH_INTERVAL_MESSAGES):
 		return
 	# If it has been 60 seconds since the last flush, or if there are 10 or more entries in the queue, flush immediately
@@ -89,16 +89,16 @@ class Entry extends Object:
 	func _init(message: String, severity: int) -> void:
 		self.message = message
 		self.severity = severity
-		self.timestamp = OS.get_datetime()
+		self.timestamp = Time.get_datetime_dict_from_unix_time(Time.get_unix_time_from_system())
 
 	## The message of the [Entry].
-	var message: String setget , get_message
+	var message: String: get = get_message
 
 	## The time when the [Entry] was created, returned as a [Dictionary] of keys (see [method OS.get_datetime]).
-	var timestamp: Dictionary setget , get_timestamp
+	var timestamp: Dictionary: get = get_timestamp
 
 	## The severity level of the [Entry].
-	var severity: int setget , get_severity
+	var severity: int: get = get_severity
 
 	## Gets the message of the [Entry].
 	func get_message() -> String:
