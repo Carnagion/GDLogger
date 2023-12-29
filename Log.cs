@@ -1,16 +1,15 @@
 using System;
+using System.Text;
 using System.Collections.Generic;
 
-namespace Godot
-{
+namespace Godot {
     /// <summary>
     /// Handles the logging of messages and <see cref="Exception"/>s to a log file.
     /// </summary>
-    public static class Log
-    {
-        static Log()
-        {
+    public static class Log {
+        static Log() {
             Log.FilePath = Log.defaultFilePath;
+            Log.AdditionalInfoFormat = string.Empty;
             
             AppDomain.CurrentDomain.UnhandledException += Log.OnUnhandledException;
             AppDomain.CurrentDomain.ProcessExit += Log.OnProcessExit;
@@ -29,6 +28,17 @@ namespace Godot
         private static readonly File file = new();
         
         private static DateTime lastSynced;
+
+        /// <summary>
+        /// <c>true</c>: Shows the type of log and the time the log was made.
+        /// <para><c>false</c>: Only shows the message.</para>
+        /// </summary>
+        public static bool ShowAdditionalInfo { get; set; }
+        /// <summary>
+        /// This property is only used when the <c>Log.ShowAdditionalInfo</c> property is true.
+        /// <para>By default the property and empty.</para>
+        /// </summary>
+        public static string AdditionalInfoFormat { get; set; }
         
         /// <summary>
         /// The file path to which log entries are written.
@@ -62,60 +72,78 @@ namespace Godot
         /// <param name="entry">The <see cref="Entry"/> to write.</param>
         public static void Write(Entry entry)
         {
-            Log.GodotPrint(entry);
-            Log.file.StoreLine(entry.ToString());
-            if (Log.entries.Count is Log.maxEntryCount)
-            {
-                Log.entries.Dequeue();
-            }
-            Log.entries.Enqueue(entry);
-            Log.Flush();
-            Log.EntryWritten?.Invoke(entry);
+            if (!ShowAdditionalInfo)
+                Write("{5}", entry);
+            else Write(AdditionalInfoFormat, entry);
         }
         
         /// <summary>
-        /// Writes <paramref name="message"/> to the log file, encoding it as a notification.
+        /// Writes <paramref name="arg"/> to the log file, encoding it as a notification.
         /// </summary>
-        /// <param name="message">The message to write.</param>
-        public static void Write(string message)
-        {
-            Log.Write(new Entry(message, Entry.MessageSeverity.Notification));
+        /// <param name="arg">The message to write.</param>
+        public static void Write(object arg) {
+            Log.Write("{0}", arg);
+        }
+
+        /// <summary>
+        /// Writes <paramref name="args"/> to the log file, encoding it as a notification.
+        /// </summary>
+        public static void Write(string format, params object[] args) {
+            Log.Write(new Entry(string.Format(format, args), Entry.MessageSeverity.Notification));
         }
         
         /// <summary>
         /// Writes <paramref name="message"/> to the log file, encoding it as a warning.
         /// </summary>
         /// <param name="message">The message to write.</param>
-        public static void Warning(string message)
+        public static void Warning(object message)
         {
-            Log.Write(new Entry(message, Entry.MessageSeverity.Warning));
+            Log.Warning("{0}", message);
+        }
+
+        /// <summary>
+        /// Writes <paramref name="args"/> to the log file, encoding it as a warning.
+        /// </summary>
+        public static void Warning(string format, params object[] args) {
+            Log.Write(new Entry(string.Format(format, args), Entry.MessageSeverity.Warning));
         }
         
         /// <summary>
         /// Writes the text representation of <paramref name="exception"/> to the log file, encoding it as a warning.
         /// </summary>
         /// <param name="exception">The <see cref="Exception"/> to write.</param>
-        public static void Warning(Exception exception)
-        {
-            Log.Write(new Entry(exception.ToString(), Entry.MessageSeverity.Warning));
+        public static void Warning(Exception exception) {
+            StringBuilder builder = new();
+            builder.Append("[{1}{2}{3}{4}]==========>\r\n").
+            Append("{5}\r\n").Append("==========>\r\n");
+            Log.Write(builder.ToString(), new Entry(exception.ToString(), Entry.MessageSeverity.Warning));
         }
         
         /// <summary>
         /// Writes <paramref name="message"/> to the log file, encoding it as an error.
         /// </summary>
         /// <param name="message">The message to write.</param>
-        public static void Error(string message)
+        public static void Error(object message)
         {
-            Log.Write(new Entry(message, Entry.MessageSeverity.Error));
+            Log.Error("{0}", message);
+        }
+
+        /// <summary>
+        /// Writes <paramref name="args"/> to the log file, encoding it as an error.
+        /// </summary>
+        public static void Error(string format, params object[] args) {
+            Log.Write(new Entry(string.Format(format, args), Entry.MessageSeverity.Error));
         }
         
         /// <summary>
         /// Writes the text representation of <paramref name="exception"/> to the log file, encoding it as an error.
         /// </summary>
         /// <param name="exception">The <see cref="Exception"/> to write.</param>
-        public static void Error(Exception exception)
-        {
-            Log.Write(new Entry(exception.ToString(), Entry.MessageSeverity.Error));
+        public static void Error(Exception exception) {
+            StringBuilder builder = new();
+            builder.Append("[{1}{2}{3}{4}]==========>\r\n").
+            Append("{5}\r\n").Append("==========>\r\n");
+            Log.Write(builder.ToString(), new Entry(exception.ToString(), Entry.MessageSeverity.Error));
         }
         
         private static void Flush(bool force = false)
@@ -172,75 +200,19 @@ namespace Godot
             }
             Log.file.Dispose();
         }
-        
-        /// <summary>
-        /// Represents a log entry.
-        /// </summary>
-        public sealed record Entry
-        {
-            /// <summary>
-            /// Initialises a new <see cref="Entry"/> with the specified parameters.
-            /// </summary>
-            /// <param name="message">The message to include in the <see cref="Entry"/>.</param>
-            /// <param name="severity">The <see cref="Entry"/>'s severity level.</param>
-            public Entry(string message, MessageSeverity severity)
+
+        private static void Write(string format, Entry entry) {
+            Log.GodotPrint(entry);
+            if (string.IsNullOrWhiteSpace(format))
+                Log.file.StoreLine(entry.ToString());
+            else Log.file.StoreLine(entry.ToString(format));
+            if (Log.entries.Count is Log.maxEntryCount)
             {
-                this.Message = message.Trim();
-                this.Severity = severity;
-                this.Timestamp = DateTime.Now;
+                Log.entries.Dequeue();
             }
-            
-            /// <summary>
-            /// The message of the <see cref="Entry"/>.
-            /// </summary>
-            public string Message
-            {
-                get;
-            }
-            
-            /// <summary>
-            /// The time when the <see cref="Entry"/> was created.
-            /// </summary>
-            public DateTime Timestamp
-            {
-                get;
-            }
-            
-            /// <summary>
-            /// The severity level of the <see cref="Entry"/>.
-            /// </summary>
-            public MessageSeverity Severity
-            {
-                get;
-            }
-            
-            /// <summary>
-            /// Returns a <see cref="String"/> that represents the <see cref="Entry"/>.
-            /// </summary>
-            /// <returns>A <see cref="String"/> in the format "[Severity] at Timestamp - Message".</returns>
-            public override string ToString()
-            {
-                return $"[{this.Severity}] at {this.Timestamp.Hour}:{this.Timestamp.Minute}:{this.Timestamp.Second}:{this.Timestamp.Millisecond} - {this.Message}";
-            }
-            
-            /// <summary>
-            /// Represents a log entry severity.
-            /// </summary>
-            public enum MessageSeverity
-            {
-                /// <summary>
-                /// Miscellaneous information.
-                /// </summary>
-                Notification,
-                /// <summary>
-                /// Minor errors that can usually be recovered from.
-                /// </summary>
-                Warning,
-                /// <summary>
-                /// Major errors that usually stop the program.
-                /// </summary>
-                Error,
-            }
+            Log.entries.Enqueue(entry);
+            Log.Flush();
+            Log.EntryWritten?.Invoke(entry);
         }
     }
 }

@@ -6,12 +6,13 @@
         <RootNamespace>Godot</RootNamespace>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-        <PackageVersion>1.0.1</PackageVersion>
+        <PackageVersion>1.1.0</PackageVersion>
         <Title>GDLogger</Title>
         <Authors>Carnagion</Authors>
         <Description>A simple logger for Godot projects.</Description>
         <RepositoryUrl>https://github.com/Carnagion/GDLogger</RepositoryUrl>
         <PackageLicenseFile>LICENSE</PackageLicenseFile>
+        <PackageOutputPath>C:\local.nuget</PackageOutputPath>
     </PropertyGroup>
     <ItemGroup>
         <Content Include=".gitignore" />
